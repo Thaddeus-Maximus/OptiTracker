@@ -305,11 +305,11 @@ public class MonitorActivity extends ActionBarActivity implements CameraBridgeVi
         try {
             // We'll do up to three scans, putting data about the first successful one into the @param dataPoints array.
             // If no scan, we'll end up putting null in the @param dataPoints array.
-            final int MAX_ADDITIONAL =2;
+            final int MAX_ADDITIONAL =3;
             for (int additional=0;additional<=MAX_ADDITIONAL;additional++) {
                 // Compute the starting height in pixels, make sure that it is in bounds.
                 int startHeightAbs = scaleRelativeToAbsolute(-startHeightRel, img.rows()) + additional;
-                if (startHeightAbs>=img.rows()-2) startHeightAbs = img.rows()-3;
+                if (startHeightAbs>=img.rows()-MAX_ADDITIONAL) startHeightAbs = img.rows()-MAX_ADDITIONAL-1;
 
                 // This will be the array we will store derivative values in.
                 // final int[] derivativeMap = new int[img.cols()];
@@ -365,12 +365,12 @@ public class MonitorActivity extends ActionBarActivity implements CameraBridgeVi
                         int derivative = (int) img.get(startHeightAbs, i)[0] - (int) img.get(startHeightAbs, i - 1)[0];
 
                         // If the derivative is significant, a little smaller or bigger than the previous max derivative, and closer to the last point than the previous max derivative, store that data.
-                        if (derivative > 17 && derivative > maxDerivative - 17 && Math.abs(targetPixel - i) < Math.abs(targetPixel - maxIndex)) {
+                        if (derivative > 17 && derivative > maxDerivative - 22 && Math.abs(targetPixel - i) < Math.abs(targetPixel - maxIndex)) {
                             maxIndex = i;
                             maxDerivative = derivative;
                         }
                         // Same thing but negative.
-                        if (derivative < -17 && derivative < minDerivative + 17 && Math.abs(targetPixel - i) < Math.abs(targetPixel - minIndex)) {
+                        if (derivative < -17 && derivative < minDerivative + 22 && Math.abs(targetPixel - i) < Math.abs(targetPixel - minIndex)) {
                             minIndex = i;
                             minDerivative = derivative;
                         }
@@ -390,7 +390,7 @@ public class MonitorActivity extends ActionBarActivity implements CameraBridgeVi
                         // Compare the size ratio to the last point
                         double sizeRatio = (dataPoints.get(lastDataPointIndex).width / newDataPoint.width);
                         // Make sure the ratio between it and the last point is between 1.17 and 0.97. These values grow exponentially with the number of points skipped.
-                        if (sizeRatio < Math.pow(1.17, (skippedDataPoints + 1)) && sizeRatio > Math.pow(0.7, (skippedDataPoints + 1))) {
+                        if (sizeRatio < Math.pow(1.16, (skippedDataPoints + 1)) && sizeRatio > Math.pow(0.6, (skippedDataPoints + 1))) {
                             // Draw a circle with a center on the output image
                             Core.circle(overlay, new Point(scaleRelativeToAbsolute(newDataPoint.x, img.cols()), scaleRelativeToAbsolute(-newDataPoint.y, img.rows())), 2, new Scalar(0, 255, 0), 3);
                             Core.circle(overlay, new Point(scaleRelativeToAbsolute(newDataPoint.x, img.cols()), scaleRelativeToAbsolute(-newDataPoint.y, img.rows())), (int) (newDataPoint.width * img.cols() / 2), new Scalar(0, 200, 255), 3);
@@ -405,7 +405,7 @@ public class MonitorActivity extends ActionBarActivity implements CameraBridgeVi
                     // If we haven't found a point before, we'll do a simple size comparison.
                     } else {
                         // If the size of the point is between 0.08 and 0.17 of half a screen, draw, log, and stop.
-                        if (newDataPoint.width < 0.12 && newDataPoint.width > 0.04) {
+                        if (newDataPoint.width < 0.15 && newDataPoint.width > 0.036) {
                             Core.circle(overlay, new Point(scaleRelativeToAbsolute(newDataPoint.x, img.cols()), scaleRelativeToAbsolute(-newDataPoint.y, img.rows())), 2, new Scalar(0, 255, 0), 3);
                             Core.circle(overlay, new Point(scaleRelativeToAbsolute(newDataPoint.x, img.cols()), scaleRelativeToAbsolute(-newDataPoint.y, img.rows())), (int) (newDataPoint.width * img.cols() / 2), new Scalar(0, 200, 255), 3);
                             dataPoints.add(newDataPoint);
@@ -484,11 +484,11 @@ public class MonitorActivity extends ActionBarActivity implements CameraBridgeVi
             confidence = Long.toString((liveDataPoints * 1000) / dataPoints.size());
         }catch(Exception e){}
         try {
-            if ((liveDataPoints * 1000) / dataPoints.size() > 400)
+            if ((liveDataPoints * 1000) / dataPoints.size() > 350)
                 overallDerivative = Long.toString((long)(accumulatedDerivative*1000) / dataPoints.size());
         }catch(Exception e){}
         try {
-            if ((liveDataPoints * 1000) / dataPoints.size() > 400)
+            if ((liveDataPoints * 1000) / dataPoints.size() > 350)
                 overallSecondDerivative = Long.toString((long)(accumulatedSecondDerivative*1000) / dataPoints.size());
         }catch(Exception e){}
 
