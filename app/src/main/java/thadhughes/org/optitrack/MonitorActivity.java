@@ -405,7 +405,7 @@ public class MonitorActivity extends ActionBarActivity implements CameraBridgeVi
                     // If we haven't found a point before, we'll do a simple size comparison.
                     } else {
                         // If the size of the point is between 0.08 and 0.17 of half a screen, draw, log, and stop.
-                        if (newDataPoint.width < 0.165 && newDataPoint.width > 0.04) {
+                        if (newDataPoint.width < 0.12 && newDataPoint.width > 0.04) {
                             Core.circle(overlay, new Point(scaleRelativeToAbsolute(newDataPoint.x, img.cols()), scaleRelativeToAbsolute(-newDataPoint.y, img.rows())), 2, new Scalar(0, 255, 0), 3);
                             Core.circle(overlay, new Point(scaleRelativeToAbsolute(newDataPoint.x, img.cols()), scaleRelativeToAbsolute(-newDataPoint.y, img.rows())), (int) (newDataPoint.width * img.cols() / 2), new Scalar(0, 200, 255), 3);
                             dataPoints.add(newDataPoint);
@@ -484,10 +484,12 @@ public class MonitorActivity extends ActionBarActivity implements CameraBridgeVi
             confidence = Long.toString((liveDataPoints * 1000) / dataPoints.size());
         }catch(Exception e){}
         try {
-            overallDerivative = Long.toString((long)(accumulatedDerivative*1000) / dataPoints.size());
+            if ((liveDataPoints * 1000) / dataPoints.size() > 400)
+                overallDerivative = Long.toString((long)(accumulatedDerivative*1000) / dataPoints.size());
         }catch(Exception e){}
         try {
-            overallSecondDerivative = Long.toString((long)(accumulatedSecondDerivative*1000) / dataPoints.size());
+            if ((liveDataPoints * 1000) / dataPoints.size() > 400)
+                overallSecondDerivative = Long.toString((long)(accumulatedSecondDerivative*1000) / dataPoints.size());
         }catch(Exception e){}
 
 
