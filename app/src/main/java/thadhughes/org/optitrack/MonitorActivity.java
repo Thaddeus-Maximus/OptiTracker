@@ -97,7 +97,6 @@ public class MonitorActivity extends ActionBarActivity implements CameraBridgeVi
         OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_9, this, mLoaderCallback);
     }
 
-    /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Log.i(TAG, "called onCreate");
@@ -197,13 +196,11 @@ public class MonitorActivity extends ActionBarActivity implements CameraBridgeVi
                 if (resultCode == Activity.RESULT_OK) {
                     String address = data.getExtras().getString(ChooseDeviceActivity.EXTRA_DEVICE_ADDRESS);
                     BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
-                    //Toast.makeText(this, address, Toast.LENGTH_LONG).show();
                     mDeviceAddress = address;
                     mNXTTalker.connect(device);
                 }
                 break;
             case REQUEST_SETTINGS:
-                //XXX?
                 break;
         }
     }

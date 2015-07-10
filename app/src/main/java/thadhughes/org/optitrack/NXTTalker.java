@@ -1,8 +1,6 @@
 package thadhughes.org.optitrack;
 
-/**
- * Created by Thaddeus on 7/6/2015.
- */
+
 /*
  * Copyright (c) 2010 Jacek Fedorynski
  *
@@ -25,6 +23,10 @@ package thadhughes.org.optitrack;
  * http://developer.android.com/resources/samples/BluetoothChat/src/com/example/android/BluetoothChat/BluetoothChatService.html
  *
  * Copyright (c) 2009 The Android Open Source Project
+ */
+
+/**
+ * The file was modified by Thaddeus Hughes on 7/6/2015.
  */
 
 import android.bluetooth.BluetoothAdapter;

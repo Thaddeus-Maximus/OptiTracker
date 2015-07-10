@@ -22,6 +22,8 @@
  * Copyright (c) 2009 The Android Open Source Project
  */
 
+/* Package name was modified by Thad Hughes */
+
 package thadhughes.org.optitrack;
 
 import android.app.Activity;
