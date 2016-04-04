@@ -90,42 +90,45 @@ task turretRegulator() {
   }
 }
 
+#define SETPOINT 110
+
+#define KP 0.35
+#define KI 0
+#define MAXI 1000
+#define KD 0
+
+#define DAMPING 100
+
+long integral=0;
+long lastError=0;
+long lastResp = 0;
+
 task main() {
   start turretRegulator;
 
-  long confidence=0;
-  long closeError=0;
-  long overallError=0;
-  long overallDerivative=0;
-  long overallSecondDerivative=0;
-  while(true) {
-    // Step 1: Get mailbox data
-    string res;
-    if(ReceiveMessage(0,true,res)==NO_ERR) {
-      if (res[0]!='E') confidence = StrToNum(res); }
-    if(ReceiveMessage(1,true,res)==NO_ERR) {
-      if (res[0]!='E') closeError = StrToNum(res); }
-    if(ReceiveMessage(2,true,res)==NO_ERR) {
-      if (res[0]!='E') overallError = StrToNum(res); }
-    if(ReceiveMessage(3,true,res)==NO_ERR) {
-      if (res[0]!='E') overallDerivative = StrToNum(res); }
-    if(ReceiveMessage(4,true,res)==NO_ERR) {
-      if (res[0]!='E') overallSecondDerivative = StrToNum(res); }
+  SetSensorColorFull(S4);
+  ColorSensorReadType ground;
 
-    // Step 2: Calculate response... if we don't have much confidence in our reading, we should probably slow down!
-    int power = confidence/12;
+  ground.Port=S4;
 
-    if (abs(overallDerivative)>100000 && power>50)
-      power = 50;
-    if (power<32) power = 32;
+  while(true){  // While we haven't reached the end
+    SysColorSensorRead(ground);
+    long error=ground.NormalizedArray[2]-SETPOINT;
+    integral+=error;
+    integral=limitTo(integral, MAXI);
 
-    int steering = sign(overallError)*pow(abs(overallError),1.2)/pow(76,1.2)
-            +sign(closeError)*pow(abs(closeError),1.2)/pow(220,1.2)
-            +sign(overallDerivative)*pow(abs(overallDerivative),1.4)/pow(8200,1.4)
-            +sign(overallSecondDerivative)*pow(abs(overallSecondDerivative),2)/pow(40000,2);
-            ;
+    long resp = error*KP+integral*KI+(error-lastError)*KD;
+    if (lastResp+DAMPING < resp) resp = lastResp+DAMPING;
+    if (lastResp-DAMPING > resp) resp = lastResp-DAMPING;
+    drive(50,resp);
 
-    // Step 3: Commit that...
-    drive(power, limitTo(steering, power>60 ? power*1.5 : power*2.5));
+    lastError=error;
+    lastResp = resp;
+
+
+    ResetSleepTimer();
+    // Don't fall asleep.
+    Wait(1);
+    // Wait so that our integral isn't racked up instantaneously.
   }
 }
